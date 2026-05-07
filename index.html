@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dro-Duino | Modular VTOL Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pcb-green: #0a3d0a;
+  --pcb-dark: #061f06;
+  --copper: #c87533;
+  --copper-light: #e8a860;
+  --solder: #d4d4d4;
+  --trace-green: #1a6b1a;
+  --led-red: #ff2a2a;
+  --led-blue: #2a8aff;
+  --led-green: #2aff6a;
+  --led-amber: #ffaa2a;
+  --silk: #ffffffcc;
+  --ground: #222;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  overflow: hidden;
+  height: 100%;
+}
+
+body {
+  background: var(--pcb-dark);
+  color: var(--silk);
+  font-family: 'Exo 2', sans-serif;
+  overflow: hidden;
+  height: 100%;
+  cursor: crosshair;
+}
+
+/* === PCB BACKGROUND PATTERN === */
+.pcb-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.pcb-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 29px, rgba(26,107,26,0.08) 29px, rgba(26,107,26,0.08) 30px),
+    repeating-linear-gradient(90deg, transparent, transparent 29px, rgba(26,107,26,0.08) 29px, rgba(26,107,26,0.08) 30px);
+}
+
+.pcb-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(26,107,26,0.15) 0%, transparent 60%);
+}
+
+/* === SCROLL CONTAINER (REVERSED) === */
+.scroll-world {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  will-change: transform;
+}
+
+.scroll-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+/* === ALTITUDE INDICATOR === */
+.altimeter {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.alt-track {
+  width: 3px;
+  height: 200px;
+  background: rgba(26,107,26,0.3);
+  border-radius: 2px;
+  position: relative;
+  border: 1px solid rgba(26,107,26,0.5);
+}
+
+.alt-fill {
+  position: absolute;
+  bottom: 0;
+  left: -1px;
+  width: 5px;
+  border-radius: 2px;
+  background: var(--led-green);
+  box-shadow: 0 0 8px var(--led-green);
+  transition: height 0.3s ease;
+}
+
+.alt-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--led-green);
+  text-shadow: 0 0 6px var(--led-green);
+  writing-mode: vertical-rl;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.alt-value {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  color: var(--led-amber);
+  text-shadow: 0 0 6px var(--led-amber);
+}
+
+/* === DRONE SVG === */
+.drone-container {
+  position: fixed;
+  z-index: 50;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.drone-svg {
+  width: 160px;
+  height: 135px;
+  filter: drop-shadow(0 0 15px rgba(42,255,106,0.2)) drop-shadow(0 4px 20px rgba(0,0,0,0.5));
+}
+
+/* === ENGINE TRAIL === */
+.engine-trail {
+  position: fixed;
+  z-index: 49;
+  pointer-events: none;
+}
+
+.trail-dot {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.prop-spin {
+  transform-origin: center;
+  animation: spin 0.15s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* === SECTION STYLING === */
+.section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 40px;
+  position: relative;
+}
+
+.section-inner {
+  max-width: 1100px;
+  width: 100%;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.section-inner.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* === COPPER TRACE DECORATIONS === */
+.trace-h {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--copper) 20%, var(--copper) 80%, transparent);
+  margin: 20px 0;
+  position: relative;
+}
+.trace-h::before, .trace-h::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--copper);
+  top: -3px;
+  box-shadow: 0 0 6px var(--copper-light);
+}
+.trace-h::before { left: 20%; }
+.trace-h::after { right: 20%; }
+
+/* === SECTION LABEL (Silkscreen style) === */
+.section-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--copper-light);
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-bottom: 8px;
+  opacity: 0.7;
+}
+
+.section-label::before {
+  content: '// ';
+  color: var(--trace-green);
+}
+
+/* === HERO SECTION === */
+.hero {
+  min-height: 100vh;
+  text-align: center;
+}
+
+.hero-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 900;
+  letter-spacing: 6px;
+  background: linear-gradient(180deg, var(--copper-light) 0%, var(--copper) 50%, #8b5a2b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.1;
+  margin-bottom: 12px;
+}
+
+.hero-sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(0.85rem, 2vw, 1.1rem);
+  color: var(--led-green);
+  text-shadow: 0 0 10px rgba(42,255,106,0.4);
+  letter-spacing: 3px;
+  margin-bottom: 40px;
+}
+
+.hero-tagline {
+  font-size: 1.15rem;
+  font-weight: 300;
+  color: rgba(255,255,255,0.6);
+  max-width: 600px;
+  margin: 0 auto 50px;
+  line-height: 1.7;
+}
+
+.scroll-hint {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  color: var(--led-amber);
+  text-shadow: 0 0 8px var(--led-amber);
+  animation: pulse 2s ease-in-out infinite;
+  letter-spacing: 2px;
+}
+
+.scroll-hint .arrow {
+  display: inline-block;
+  animation: bounceDown 1.5s ease-in-out infinite;
+  font-size: 18px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+@keyframes bounceDown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* === STAT BADGES === */
+.stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin: 30px 0;
+}
+
+.stat-badge {
+  background: rgba(10,61,10,0.5);
+  border: 1px solid var(--trace-green);
+  border-radius: 4px;
+  padding: 14px 22px;
+  text-align: center;
+  min-width: 130px;
+  position: relative;
+}
+
+.stat-badge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--copper);
+}
+
+.stat-val {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--copper-light);
+}
+
+.stat-unit {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--led-green);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 4px;
+}
+
+/* === MODULE GRID === */
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 30px 0;
+}
+
+.module-card {
+  background: linear-gradient(135deg, rgba(10,61,10,0.6), rgba(6,31,6,0.9));
+  border: 1px solid var(--trace-green);
+  border-radius: 6px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+.module-card:hover {
+  border-color: var(--copper);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(200,117,51,0.15);
+}
+
+.module-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--copper);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.module-card:hover::after { opacity: 1; }
+
+.module-icon {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.module-name {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--copper-light);
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.module-desc {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.5;
+}
+
+/* === PIN HEADER STYLE === */
+.pin-header {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--silk);
+  margin: 24px 0;
+  line-height: 2;
+}
+
+.pin-header .pin-label {
+  color: var(--copper-light);
+  display: inline-block;
+  min-width: 160px;
+}
+
+.pin-header .pin-val {
+  color: var(--led-green);
+  text-shadow: 0 0 4px rgba(42,255,106,0.3);
+}
+
+/* === ARCHITECTURE DIAGRAM === */
+.arch-diagram {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 20px;
+  align-items: start;
+  margin: 30px 0;
+}
+
+.arch-box {
+  background: rgba(10,61,10,0.4);
+  border: 1px solid var(--trace-green);
+  border-radius: 6px;
+  padding: 20px;
+}
+
+.arch-box h4 {
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--copper-light);
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+.arch-box ul {
+  list-style: none;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.6);
+  line-height: 2;
+}
+.arch-box ul li::before {
+  content: '▸ ';
+  color: var(--led-green);
+}
+
+.arch-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 30px;
+}
+
+.arch-connector .conn-line {
+  width: 2px;
+  height: 40px;
+  background: var(--copper);
+}
+.arch-connector .conn-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--led-amber);
+  text-shadow: 0 0 4px var(--led-amber);
+  writing-mode: vertical-rl;
+  letter-spacing: 2px;
+}
+
+/* === LED STATUS ROW === */
+.led-row {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.led-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.led-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: ledBlink 2s ease-in-out infinite;
+}
+.led-dot.green { background: var(--led-green); box-shadow: 0 0 8px var(--led-green); }
+.led-dot.amber { background: var(--led-amber); box-shadow: 0 0 8px var(--led-amber); animation-delay: 0.5s; }
+.led-dot.blue { background: var(--led-blue); box-shadow: 0 0 8px var(--led-blue); animation-delay: 1s; }
+.led-dot.red { background: var(--led-red); box-shadow: 0 0 8px var(--led-red); animation-delay: 1.5s; }
+
+.led-text {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+}
+
+@keyframes ledBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* === SECTION HEADINGS === */
+h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 700;
+  color: var(--copper-light);
+  margin-bottom: 6px;
+  letter-spacing: 2px;
+}
+
+h3 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 20px;
+  letter-spacing: 3px;
+}
+
+.body-text {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.8;
+  max-width: 700px;
+}
+
+/* === FOOTER === */
+.footer-section {
+  text-align: center;
+  min-height: 60vh;
+}
+
+.footer-section .section-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.t3rc-badge {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--trace-green);
+  border: 1px solid var(--trace-green);
+  display: inline-block;
+  padding: 8px 20px;
+  border-radius: 3px;
+  letter-spacing: 3px;
+  margin-top: 30px;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .section { padding: 60px 20px; }
+  .arch-diagram { grid-template-columns: 1fr; }
+  .arch-connector { flex-direction: row; padding: 0; }
+  .arch-connector .conn-line { width: 40px; height: 2px; }
+  .arch-connector .conn-label { writing-mode: horizontal-tb; }
+  .altimeter { right: 12px; }
+  .alt-track { height: 120px; }
+  .module-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 480px) {
+  .module-grid { grid-template-columns: 1fr; }
+  .stat-row { gap: 10px; }
+  .stat-badge { min-width: 100px; padding: 10px 14px; }
+}
+
+/* === PARTICLE TRACES === */
+.particle-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<div class="pcb-bg"></div>
+<canvas class="particle-canvas" id="particles"></canvas>
+
+<!-- ALTIMETER -->
+<div class="altimeter">
+  <div class="alt-value" id="altVal">0m</div>
+  <div class="alt-track">
+    <div class="alt-fill" id="altFill"></div>
+  </div>
+  <div class="alt-label">ALT</div>
+</div>
+
+<!-- ENGINE TRAIL -->
+<div class="engine-trail" id="engineTrail"></div>
+
+<!-- DRONE -->
+<div class="drone-container" id="droneEl">
+  <svg class="drone-svg" viewBox="0 0 260 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Fuselage gradient: white body -->
+      <linearGradient id="fuseGrad" x1="115" y1="20" x2="145" y2="20" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#a8a8a8"/>
+        <stop offset="30%" stop-color="#e8e8e8"/>
+        <stop offset="55%" stop-color="#f5f5f5"/>
+        <stop offset="80%" stop-color="#e0e0e0"/>
+        <stop offset="100%" stop-color="#999"/>
+      </linearGradient>
+      <!-- Nose cone gradient -->
+      <linearGradient id="noseGrad" x1="120" y1="5" x2="140" y2="5" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#222"/>
+        <stop offset="40%" stop-color="#444"/>
+        <stop offset="100%" stop-color="#1a1a1a"/>
+      </linearGradient>
+      <!-- Wing gradient -->
+      <linearGradient id="wingGrad" x1="130" y1="90" x2="130" y2="130" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#c0c0c0"/>
+        <stop offset="50%" stop-color="#a0a0a0"/>
+        <stop offset="100%" stop-color="#808080"/>
+      </linearGradient>
+      <!-- Wing dark structure -->
+      <linearGradient id="wingStructGrad" x1="0" y1="100" x2="0" y2="135" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#3a3a3a"/>
+        <stop offset="100%" stop-color="#222"/>
+      </linearGradient>
+      <!-- Motor mount gradient -->
+      <linearGradient id="motorGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#555"/>
+        <stop offset="100%" stop-color="#222"/>
+      </linearGradient>
+      <!-- Glow filter for LEDs -->
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="2" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glowBig" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+
+    <!-- ====== WING (behind fuselage) ====== -->
+    <!-- Wing main shape - wide swept planform -->
+    <path d="
+      M130,88
+      C138,88 160,90 185,100
+      Q210,108 240,118
+      Q248,122 246,128
+      Q244,134 230,132
+      L185,124
+      Q160,120 138,118
+      L130,118
+      L122,118
+      Q100,120 75,124
+      L30,132
+      Q16,134 14,128
+      Q12,122 20,118
+      Q50,108 75,100
+      C100,90 122,88 130,88Z
+    " fill="url(#wingGrad)" stroke="#888" stroke-width="0.5"/>
+
+    <!-- Wing internal structure - dark ribs/spars visible through skin -->
+    <!-- Left wing structure cutouts -->
+    <rect x="38" y="104" width="14" height="16" rx="2" fill="url(#wingStructGrad)" opacity="0.85"/>
+    <rect x="56" y="100" width="12" height="16" rx="2" fill="url(#wingStructGrad)" opacity="0.85"/>
+    <rect x="72" y="97" width="10" height="15" rx="2" fill="url(#wingStructGrad)" opacity="0.8"/>
+    <rect x="86" y="95" width="9" height="14" rx="2" fill="url(#wingStructGrad)" opacity="0.75"/>
+    <rect x="38" y="122" width="14" height="6" rx="1" fill="url(#wingStructGrad)" opacity="0.6"/>
+    <rect x="56" y="118" width="12" height="6" rx="1" fill="url(#wingStructGrad)" opacity="0.6"/>
+    <rect x="72" y="114" width="10" height="6" rx="1" fill="url(#wingStructGrad)" opacity="0.55"/>
+
+    <!-- Right wing structure cutouts -->
+    <rect x="208" y="104" width="14" height="16" rx="2" fill="url(#wingStructGrad)" opacity="0.85"/>
+    <rect x="192" y="100" width="12" height="16" rx="2" fill="url(#wingStructGrad)" opacity="0.85"/>
+    <rect x="178" y="97" width="10" height="15" rx="2" fill="url(#wingStructGrad)" opacity="0.8"/>
+    <rect x="165" y="95" width="9" height="14" rx="2" fill="url(#wingStructGrad)" opacity="0.75"/>
+    <rect x="208" y="122" width="14" height="6" rx="1" fill="url(#wingStructGrad)" opacity="0.6"/>
+    <rect x="192" y="118" width="12" height="6" rx="1" fill="url(#wingStructGrad)" opacity="0.6"/>
+    <rect x="178" y="114" width="10" height="6" rx="1" fill="url(#wingStructGrad)" opacity="0.55"/>
+
+    <!-- Wing spar lines -->
+    <line x1="20" y1="125" x2="110" y2="110" stroke="#555" stroke-width="0.8" opacity="0.4"/>
+    <line x1="150" y1="110" x2="240" y2="125" stroke="#555" stroke-width="0.8" opacity="0.4"/>
+    <line x1="28" y1="118" x2="105" y2="95" stroke="#666" stroke-width="0.5" opacity="0.3"/>
+    <line x1="155" y1="95" x2="232" y2="118" stroke="#666" stroke-width="0.5" opacity="0.3"/>
+
+    <!-- Wing trailing edge dark strip -->
+    <path d="M30,130 Q80,124 110,118 L120,118 L130,118 L140,118 L150,118 Q180,124 230,130 Q244,133 230,132 L75,124 Q30,132 18,130Z" fill="#333" opacity="0.3"/>
+
+    <!-- Nav lights on wing trailing edge -->
+    <circle cx="38" cy="130" r="1.8" fill="#ff2222" filter="url(#glow)">
+      <animate attributeName="opacity" values="1;0.3;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="222" cy="130" r="1.8" fill="#ff2222" filter="url(#glow)">
+      <animate attributeName="opacity" values="1;0.3;1" dur="1.2s" repeatCount="indefinite" begin="0.6s"/>
+    </circle>
+
+    <!-- ====== FUSELAGE ====== -->
+    <!-- Main fuselage body - torpedo/bullet shape, nose up -->
+    <path d="
+      M130,18
+      Q136,18 140,28
+      L143,50
+      L144,75
+      L144,105
+      L143,130
+      Q142,145 140,155
+      L138,162
+      Q134,170 130,172
+      Q126,170 122,162
+      L120,155
+      Q118,145 117,130
+      L116,105
+      L116,75
+      L117,50
+      L120,28
+      Q124,18 130,18Z
+    " fill="url(#fuseGrad)" stroke="#999" stroke-width="0.6"/>
+
+    <!-- Fuselage panel lines -->
+    <line x1="120" y1="55" x2="140" y2="55" stroke="#aaa" stroke-width="0.3" opacity="0.5"/>
+    <line x1="119" y1="75" x2="141" y2="75" stroke="#aaa" stroke-width="0.3" opacity="0.5"/>
+    <line x1="118" y1="105" x2="142" y2="105" stroke="#aaa" stroke-width="0.3" opacity="0.5"/>
+    <line x1="119" y1="130" x2="141" y2="130" stroke="#aaa" stroke-width="0.3" opacity="0.5"/>
+    <!-- Centerline -->
+    <line x1="130" y1="28" x2="130" y2="170" stroke="#bbb" stroke-width="0.3" opacity="0.3"/>
+
+    <!-- ====== NOSE CONE ====== -->
+    <path d="
+      M130,5
+      Q134,5 137,12
+      L140,24
+      Q140,28 138,30
+      L130,32
+      L122,30
+      Q120,28 120,24
+      L123,12
+      Q126,5 130,5Z
+    " fill="url(#noseGrad)" stroke="#444" stroke-width="0.5"/>
+    <!-- Antenna nub on nose -->
+    <line x1="130" y1="2" x2="130" y2="8" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- White-to-dark transition on nose -->
+    <path d="M122,30 Q126,26 130,25 Q134,26 138,30 L140,35 Q135,32 130,31 Q125,32 120,35Z" fill="#bbb" opacity="0.5"/>
+
+    <!-- ====== RED MODULE BAY PANEL ====== -->
+    <rect x="122" y="60" width="16" height="12" rx="1.5" fill="#cc2222" stroke="#991111" stroke-width="0.6"/>
+    <!-- Panel screws -->
+    <circle cx="124.5" cy="62.5" r="0.8" fill="#881111"/>
+    <circle cx="135.5" cy="62.5" r="0.8" fill="#881111"/>
+    <circle cx="124.5" cy="69.5" r="0.8" fill="#881111"/>
+    <circle cx="135.5" cy="69.5" r="0.8" fill="#881111"/>
+
+    <!-- ====== TOP MOTOR MOUNTS (on wing) ====== -->
+    <!-- Left motor pylon -->
+    <path d="M78,90 L74,78 Q74,74 78,74 L82,74 Q86,74 86,78 L82,90" fill="#333" stroke="#555" stroke-width="0.5"/>
+    <rect x="73" y="74" width="14" height="8" rx="2" fill="url(#motorGrad)" stroke="#666" stroke-width="0.5"/>
+    <!-- Left motor bell -->
+    <ellipse cx="80" cy="73" rx="6" ry="4" fill="#555" stroke="#777" stroke-width="0.4"/>
+    <circle cx="80" cy="73" r="2.5" fill="#333"/>
+    <!-- Left prop disc -->
+    <g class="prop-spin" style="transform-origin: 80px 73px;">
+      <ellipse cx="80" cy="73" rx="22" ry="4" fill="rgba(180,200,220,0.15)" stroke="rgba(180,200,220,0.25)" stroke-width="0.5"/>
+    </g>
+
+    <!-- Right motor pylon -->
+    <path d="M178,90 L174,78 Q174,74 178,74 L182,74 Q186,74 186,78 L182,90" fill="#333" stroke="#555" stroke-width="0.5"/>
+    <rect x="173" y="74" width="14" height="8" rx="2" fill="url(#motorGrad)" stroke="#666" stroke-width="0.5"/>
+    <!-- Right motor bell -->
+    <ellipse cx="180" cy="73" rx="6" ry="4" fill="#555" stroke="#777" stroke-width="0.4"/>
+    <circle cx="180" cy="73" r="2.5" fill="#333"/>
+    <!-- Right prop disc -->
+    <g class="prop-spin" style="transform-origin: 180px 73px; animation-direction: reverse;">
+      <ellipse cx="180" cy="73" rx="22" ry="4" fill="rgba(180,200,220,0.15)" stroke="rgba(180,200,220,0.25)" stroke-width="0.5"/>
+    </g>
+
+    <!-- ====== BOTTOM MOTOR / PUSHER ====== -->
+    <!-- Struts from fuselage to bottom motor -->
+    <line x1="124" y1="155" x2="120" y2="180" stroke="#888" stroke-width="1" stroke-linecap="round"/>
+    <line x1="136" y1="155" x2="140" y2="180" stroke="#888" stroke-width="1" stroke-linecap="round"/>
+    <line x1="124" y1="165" x2="140" y2="180" stroke="#888" stroke-width="0.5" opacity="0.5"/>
+    <line x1="136" y1="165" x2="120" y2="180" stroke="#888" stroke-width="0.5" opacity="0.5"/>
+    <!-- Bottom motor housing -->
+    <rect x="122" y="178" width="16" height="12" rx="3" fill="#2a2a2a" stroke="#555" stroke-width="0.5"/>
+    <circle cx="130" cy="184" r="4" fill="#333" stroke="#666" stroke-width="0.5"/>
+    <circle cx="130" cy="184" r="1.8" fill="#222"/>
+    <!-- Bottom prop disc -->
+    <g class="prop-spin" style="transform-origin: 130px 193px;">
+      <ellipse cx="130" cy="193" rx="18" ry="3.5" fill="rgba(180,200,220,0.12)" stroke="rgba(180,200,220,0.2)" stroke-width="0.5"/>
+    </g>
+
+    <!-- ====== LOWER STABILIZER FINS ====== -->
+    <path d="M126,148 L112,158 L115,155 L124,148Z" fill="#ccc" stroke="#999" stroke-width="0.4"/>
+    <path d="M134,148 L148,158 L145,155 L136,148Z" fill="#ccc" stroke="#999" stroke-width="0.4"/>
+
+    <!-- ====== CAMERA/PAYLOAD under fuselage ====== -->
+    <rect x="125" y="140" width="10" height="8" rx="2" fill="#1a1a1a" stroke="#444" stroke-width="0.5"/>
+    <circle cx="130" cy="144" r="2.5" fill="#111" stroke="#333" stroke-width="0.4"/>
+    <!-- Camera lens glow -->
+    <circle cx="130" cy="144" r="1.2" fill="#2a8aff" opacity="0.6" filter="url(#glow)">
+      <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- ====== STATUS LED on fuselage top ====== -->
+    <circle cx="130" cy="40" r="2" fill="#2aff6a" filter="url(#glow)">
+      <animate attributeName="opacity" values="0.9;0.3;0.9" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- ====== SUBTLE FUSELAGE HIGHLIGHT ====== -->
+    <path d="M126,30 Q130,28 134,30 L135,60 Q130,58 125,60Z" fill="white" opacity="0.08"/>
+  </svg>
+</div>
+
+<!-- SCROLL WORLD -->
+<div class="scroll-world" id="scrollWorld">
+  <div class="scroll-content" id="scrollContent">
+
+    <!-- SECTION 7: FOOTER (bottom of stack = top of scroll) -->
+    <section class="section footer-section" data-section="footer">
+      <div class="section-inner">
+        <div class="section-label">sys.exit()</div>
+        <h2>LAUNCH SEQUENCE</h2>
+        <h3>Ready for Deployment</h3>
+        <div class="trace-h"></div>
+        <p class="body-text" style="text-align:center; margin: 0 auto;">
+          Dro-Duino is an open research platform by the T3-RC collective. Modular by design, autonomous by nature, open by philosophy. From bench testing to beyond visual line of sight &mdash; this is VTOL, redefined.
+        </p>
+        <div class="led-row" style="justify-content: center; margin-top: 24px;">
+          <div class="led-indicator"><div class="led-dot green"></div><span class="led-text">SYSTEMS GO</span></div>
+          <div class="led-indicator"><div class="led-dot blue"></div><span class="led-text">TELEMETRY LIVE</span></div>
+          <div class="led-indicator"><div class="led-dot amber"></div><span class="led-text">GPS LOCK</span></div>
+        </div>
+        <div class="t3rc-badge">T3-RC RESEARCH COLLECTIVE // NYC 2026</div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: SENSOR SUITE -->
+    <section class="section" data-section="sensors">
+      <div class="section-inner">
+        <div class="section-label">sensor_array.init()</div>
+        <h2>SENSOR SUITE</h2>
+        <h3>Distributed Fusion Architecture</h3>
+        <div class="trace-h"></div>
+        <p class="body-text">
+          Nine custom AI vision modules power autonomous decision-making across every flight phase. The dual-Pi architecture distributes sensor processing &mdash; forward-facing systems on Pi&nbsp;#1, downward-facing on Pi&nbsp;#2 &mdash; for redundancy and specialized computation.
+        </p>
+        <div class="module-grid" style="margin-top: 24px;">
+          <div class="module-card">
+            <div class="module-icon">&#128225;</div>
+            <div class="module-name">TF-Luna LiDAR</div>
+            <div class="module-desc">I2C rangefinder for precision altitude hold and obstacle avoidance during VTOL operations</div>
+          </div>
+          <div class="module-card">
+            <div class="module-icon">&#128266;</div>
+            <div class="module-name">HC-SR04 Sonar</div>
+            <div class="module-desc">Ultrasonic backup ranging via GPIO with voltage divider circuit for RPi integration</div>
+          </div>
+          <div class="module-card">
+            <div class="module-icon">&#128247;</div>
+            <div class="module-name">Dual Pi Cameras</div>
+            <div class="module-desc">Camera Module v3 on each Pi for simultaneous forward and downward vision processing</div>
+          </div>
+          <div class="module-card">
+            <div class="module-icon">&#129517;</div>
+            <div class="module-name">Pixhawk IMU</div>
+            <div class="module-desc">9-DOF inertial measurement with GPS for attitude estimation and autonomous navigation</div>
+          </div>
+        </div>
+        <div class="pin-header" style="margin-top: 20px;">
+          <div><span class="pin-label">MAVLINK_PORT</span> <span class="pin-val">/dev/ttyACM0 @ 115200</span></div>
+          <div><span class="pin-label">I2C_BUS</span> <span class="pin-val">Bus 1, TF-Luna @ 0x10</span></div>
+          <div><span class="pin-label">SONAR_TRIG</span> <span class="pin-val">GPIO 23 (BCM)</span></div>
+          <div><span class="pin-label">SONAR_ECHO</span> <span class="pin-val">GPIO 24 (BCM) w/ divider</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: ARCHITECTURE -->
+    <section class="section" data-section="arch">
+      <div class="section-inner">
+        <div class="section-label">system.architecture()</div>
+        <h2>DUAL-PI BRAIN</h2>
+        <h3>Dual Jetson Nano Companion Architecture</h3>
+        <div class="trace-h"></div>
+        <div class="arch-diagram">
+          <div class="arch-box">
+            <h4>&#128994; JETSON NANO (PRIMARY)</h4>
+            <ul>
+              <li>Fixed-wing flight ops</li>
+              <li>Forward-facing cameras</li>
+              <li>Primary MAVLink bridge</li>
+              <li>CUDA-accelerated AI inference</li>
+              <li>Telemetry WebSocket</li>
+            </ul>
+          </div>
+          <div class="arch-connector">
+            <div class="conn-line"></div>
+            <div class="conn-label">PIXHAWK 2.4.8</div>
+            <div class="conn-line"></div>
+          </div>
+          <div class="arch-box">
+            <h4>&#128309; RASPBERRY PI (SECONDARY)</h4>
+            <ul>
+              <li>VTOL hover control</li>
+              <li>Downward-facing cameras</li>
+              <li>Landing zone detection</li>
+              <li>Lightweight sensor fusion</li>
+              <li>Cargo bay management</li>
+            </ul>
+          </div>
+        </div>
+        <div class="led-row" style="margin-top: 12px;">
+          <div class="led-indicator"><div class="led-dot green"></div><span class="led-text">NANO HEARTBEAT</span></div>
+          <div class="led-indicator"><div class="led-dot blue"></div><span class="led-text">RPi HEARTBEAT</span></div>
+          <div class="led-indicator"><div class="led-dot amber"></div><span class="led-text">PIXHAWK LINK</span></div>
+          <div class="led-indicator"><div class="led-dot red"></div><span class="led-text">ARMED</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: MODULES -->
+    <section class="section" data-section="modules">
+      <div class="section-inner">
+        <div class="section-label">module.enumerate()</div>
+        <h2>14 MISSION MODULES</h2>
+        <h3>Hot-Swappable Payload Architecture</h3>
+        <div class="trace-h"></div>
+        <p class="body-text">
+          Each module slots into a standardized carrier board with power, data, and mechanical interfaces. Swap in seconds &mdash; no tools, no firmware changes, no recalibration. Just click and fly.
+        </p>
+        <div class="module-grid">
+          <div class="module-card">
+            <div class="module-icon">&#127777;&#65039;</div>
+            <div class="module-name">THERMAL IMAGING</div>
+            <div class="module-desc">FLIR-class IR sensor for search &amp; rescue, agriculture, and infrastructure inspection</div>
+          </div>
+          <div class="module-card">
+            <div class="module-icon">&#128269;</div>
+            <div class="module-name">ZOOM OPTICS</div>
+            <div class="module-desc">30x optical zoom for high-altitude surveillance and wildlife monitoring</div>
+          </div>
+          <div class="module-card">
+            <div class="module-icon">&#128300;</div>
+            <div class="module-name">MACRO VISION</div>
+            <div class="module-desc">Close-range inspection for infrastructure cracks, corrosion, and surface defects</div>
+          </div>
+          <div class="module-card">
+            <div class="module-icon">&#128230;</div>
+            <div class="module-name">CARGO BAY</div>
+            <div class="module-desc">Autonomous delivery payload with GPS-guided drop and confirmation systems</div>
+          </div>
+          <div class="module-card">
+            <div class="module-icon">&#128161;</div>
+            <div class="module-name">LED ARRAY</div>
+            <div class="module-desc">Multi-mode programmable lighting for night ops, signaling, and entertainment</div>
+          </div>
+          <div class="module-card">
+            <div class="module-icon">&#128737;&#65039;</div>
+            <div class="module-name">SECURITY PATROL</div>
+            <div class="module-desc">AI-powered perimeter monitoring with anomaly detection and live alerting</div>
+          </div>
+          <div class="module-card">
+            <div class="module-icon">&#127807;</div>
+            <div class="module-name">NDVI SCANNER</div>
+            <div class="module-desc">Multispectral vegetation analysis for precision agriculture</div>
+          </div>
+          <div class="module-card">
+            <div class="module-icon">&#128225;</div>
+            <div class="module-name">RELAY NODE</div>
+            <div class="module-desc">Mesh networking relay for extending comms range in remote operations</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: POWER SYSTEM -->
+    <section class="section" data-section="power">
+      <div class="section-inner">
+        <div class="section-label">power.config()</div>
+        <h2>PROPULSION &amp; POWER</h2>
+        <h3>Tailsitter VTOL Drive System</h3>
+        <div class="trace-h"></div>
+        <div class="stat-row">
+          <div class="stat-badge">
+            <div class="stat-val">400</div>
+            <div class="stat-unit">KV Rating</div>
+          </div>
+          <div class="stat-badge">
+            <div class="stat-val">6S</div>
+            <div class="stat-unit">LiPo Pack</div>
+          </div>
+          <div class="stat-badge">
+            <div class="stat-val">16"</div>
+            <div class="stat-unit">Propellers</div>
+          </div>
+          <div class="stat-badge">
+            <div class="stat-val">60A</div>
+            <div class="stat-unit">ESC Cont.</div>
+          </div>
+          <div class="stat-badge">
+            <div class="stat-val">FOC</div>
+            <div class="stat-unit">Drive Mode</div>
+          </div>
+        </div>
+        <div class="pin-header">
+          <div><span class="pin-label">MOTORS</span> <span class="pin-val">T-Motor MN4012-11 400KV &times; 2</span></div>
+          <div><span class="pin-label">ESC_PRIMARY</span> <span class="pin-val">T-Motor ALPHA 60A (FOC + CAN)</span></div>
+          <div><span class="pin-label">BATTERY</span> <span class="pin-val">6S LiPo 22.2V nom / 25.2V max</span></div>
+          <div><span class="pin-label">PROTOCOL</span> <span class="pin-val">CAN 2.0 + PWM fallback</span></div>
+          <div><span class="pin-label">FIRMWARE</span> <span class="pin-val">AM32 (open-source, recommended)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: SPECS -->
+    <section class="section" data-section="specs">
+      <div class="section-inner">
+        <div class="section-label">drone.getSpecs()</div>
+        <h2>PLATFORM SPECS</h2>
+        <h3>Quetzcoatl Tailsitter VTOL</h3>
+        <div class="trace-h"></div>
+        <div class="stat-row">
+          <div class="stat-badge">
+            <div class="stat-val">5'</div>
+            <div class="stat-unit">Wingspan</div>
+          </div>
+          <div class="stat-badge">
+            <div class="stat-val">2</div>
+            <div class="stat-unit">Motors</div>
+          </div>
+          <div class="stat-badge">
+            <div class="stat-val">14</div>
+            <div class="stat-unit">Modules</div>
+          </div>
+          <div class="stat-badge">
+            <div class="stat-val">9</div>
+            <div class="stat-unit">AI Vision</div>
+          </div>
+          <div class="stat-badge">
+            <div class="stat-val">1+1</div>
+            <div class="stat-unit">Nano + RPi</div>
+          </div>
+        </div>
+        <p class="body-text">
+          A dual-motor tailsitter that transitions seamlessly between vertical hover and efficient fixed-wing cruise. The Quetzcoatl bridges the gap between consumer toys and enterprise platforms &mdash; targeting the $15K&ndash;$35K prosumer market with truly modular mission architecture.
+        </p>
+        <div class="pin-header" style="margin-top: 20px;">
+          <div><span class="pin-label">FLIGHT_CTRL</span> <span class="pin-val">Pixhawk 2.4.8 + ArduPilot</span></div>
+          <div><span class="pin-label">COMPANION_0</span> <span class="pin-val">Jetson Nano 4GB (Primary &mdash; Fixed-Wing)</span></div>
+          <div><span class="pin-label">COMPANION_1</span> <span class="pin-val">Raspberry Pi 4 (Secondary &mdash; VTOL Hover)</span></div>
+          <div><span class="pin-label">INFERENCE</span> <span class="pin-val">CUDA 10.2 / TensorRT 8 / JetPack 4.6</span></div>
+          <div><span class="pin-label">MARKET_GAP</span> <span class="pin-val">$15K&ndash;$35K Prosumer Segment</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1: HERO (top of stack = bottom of scroll / starting view) -->
+    <section class="section hero" data-section="hero">
+      <div class="section-inner">
+        <div class="section-label">T3-RC Research Collective</div>
+        <h1 class="hero-title">DRO-DUINO</h1>
+        <div class="hero-sub">MODULAR AUTONOMOUS VTOL PLATFORM</div>
+        <div class="trace-h" style="max-width: 400px; margin: 20px auto;"></div>
+        <p class="hero-tagline">
+          14 interchangeable mission modules. Dual companion computers. One aircraft that does it all. Open research meets autonomous flight.
+        </p>
+        <div class="stat-row">
+          <div class="stat-badge">
+            <div class="stat-val">5ft</div>
+            <div class="stat-unit">Wingspan</div>
+          </div>
+          <div class="stat-badge">
+            <div class="stat-val">14</div>
+            <div class="stat-unit">Modules</div>
+          </div>
+          <div class="stat-badge">
+            <div class="stat-val">9</div>
+            <div class="stat-unit">AI Cores</div>
+          </div>
+        </div>
+        <div class="scroll-hint">
+          <span class="arrow">&uarr;</span> SCROLL TO ASCEND <span class="arrow">&uarr;</span><br>
+          <span style="font-size: 10px; opacity: 0.6; margin-top: 6px; display: inline-block;">MOVE MOUSE OR A/D KEYS TO STEER</span>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+// ===== REVERSE SCROLL ENGINE =====
+const scrollWorld = document.getElementById('scrollWorld');
+const scrollContent = document.getElementById('scrollContent');
+const droneEl = document.getElementById('droneEl');
+const altFill = document.getElementById('altFill');
+const altVal = document.getElementById('altVal');
+const engineTrail = document.getElementById('engineTrail');
+
+let maxScroll = 0;
+let targetScroll = 0;
+let currentScroll = 0;
+
+function calcMaxScroll() {
+  const contentH = scrollContent.offsetHeight;
+  const windowH = window.innerHeight;
+  maxScroll = Math.max(0, contentH - windowH);
+}
+calcMaxScroll();
+window.addEventListener('resize', calcMaxScroll);
+
+// ===== DRONE HORIZONTAL CONTROL =====
+let droneTargetX = window.innerWidth / 2;  // target X in px
+let droneCurrentX = window.innerWidth / 2; // smoothed X
+let droneVelX = 0;                          // velocity for roll calc
+let hoverPhase = 0;                         // hover bob phase
+
+// Mouse tracking
+window.addEventListener('mousemove', (e) => {
+  droneTargetX = e.clientX;
+});
+
+// Touch tracking
+window.addEventListener('touchmove', (e) => {
+  if (e.touches.length > 0) {
+    droneTargetX = e.touches[0].clientX;
+  }
+}, { passive: true });
+
+// Keyboard left/right
+const keysDown = {};
+window.addEventListener('keydown', (e) => {
+  keysDown[e.key] = true;
+  const step = window.innerHeight * 0.3;
+  if (e.key === 'ArrowDown' || e.key === ' ') {
+    e.preventDefault();
+    targetScroll = Math.min(maxScroll, targetScroll + step);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    targetScroll = Math.max(0, targetScroll - step);
+  }
+});
+window.addEventListener('keyup', (e) => { keysDown[e.key] = false; });
+
+// Wheel handler
+window.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  targetScroll = Math.max(0, Math.min(maxScroll, targetScroll + e.deltaY * 1.2));
+}, { passive: false });
+
+// Touch scroll (vertical)
+let touchStartY = 0;
+window.addEventListener('touchstart', (e) => {
+  touchStartY = e.touches[0].clientY;
+  droneTargetX = e.touches[0].clientX;
+}, { passive: true });
+
+window.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  const delta = touchStartY - e.touches[0].clientY;
+  touchStartY = e.touches[0].clientY;
+  targetScroll = Math.max(0, Math.min(maxScroll, targetScroll + delta * 2.5));
+}, { passive: false });
+
+// ===== ENGINE TRAIL SYSTEM =====
+const trailDots = [];
+const MAX_TRAIL = 30;
+
+function spawnTrailDot(x, y) {
+  const dot = document.createElement('div');
+  dot.className = 'trail-dot';
+  const size = 3 + Math.random() * 5;
+  const isGreen = Math.random() > 0.4;
+  const color = isGreen ? '42,255,106' : '200,117,51';
+  dot.style.width = size + 'px';
+  dot.style.height = size + 'px';
+  dot.style.left = (x - size / 2 + (Math.random() - 0.5) * 14) + 'px';
+  dot.style.top = (y + (Math.random() - 0.5) * 6) + 'px';
+  dot.style.background = `rgba(${color},0.7)`;
+  dot.style.boxShadow = `0 0 ${size * 2}px rgba(${color},0.4)`;
+  engineTrail.appendChild(dot);
+
+  const entry = { el: dot, life: 1, speed: 0.5 + Math.random() * 1.5, drift: (Math.random() - 0.5) * 0.8 };
+  trailDots.push(entry);
+
+  // Trim old dots
+  while (trailDots.length > MAX_TRAIL) {
+    const old = trailDots.shift();
+    old.el.remove();
+  }
+}
+
+function updateTrail() {
+  for (let i = trailDots.length - 1; i >= 0; i--) {
+    const d = trailDots[i];
+    d.life -= 0.025;
+    const currentTop = parseFloat(d.el.style.top);
+    const currentLeft = parseFloat(d.el.style.left);
+    d.el.style.top = (currentTop + d.speed) + 'px';
+    d.el.style.left = (currentLeft + d.drift) + 'px';
+    d.el.style.opacity = Math.max(0, d.life);
+    d.el.style.transform = `scale(${0.3 + d.life * 0.7})`;
+
+    if (d.life <= 0) {
+      d.el.remove();
+      trailDots.splice(i, 1);
+    }
+  }
+}
+
+// ===== ANIMATION LOOP =====
+let lastTime = performance.now();
+let trailTimer = 0;
+
+function animate(now) {
+  const dt = Math.min((now - lastTime) / 16.67, 3); // normalized to ~60fps
+  lastTime = now;
+
+  // Keyboard horizontal movement
+  const kbSpeed = 8 * dt;
+  if (keysDown['ArrowLeft'] || keysDown['a']) {
+    droneTargetX = Math.max(80, droneTargetX - kbSpeed);
+  }
+  if (keysDown['ArrowRight'] || keysDown['d']) {
+    droneTargetX = Math.min(window.innerWidth - 80, droneTargetX + kbSpeed);
+  }
+
+  // Smooth scroll
+  currentScroll += (targetScroll - currentScroll) * 0.1 * dt;
+  scrollContent.style.transform = `translateY(${currentScroll}px)`;
+
+  // Smooth drone X with velocity tracking
+  const prevX = droneCurrentX;
+  const lerpFactor = 0.08 * dt;
+  droneCurrentX += (droneTargetX - droneCurrentX) * lerpFactor;
+  droneVelX = droneCurrentX - prevX;
+
+  // Clamp
+  droneCurrentX = Math.max(80, Math.min(window.innerWidth - 80, droneCurrentX));
+
+  // Progress 0..1
+  const progress = maxScroll > 0 ? currentScroll / maxScroll : 0;
+
+  // Drone Y: starts at bottom, rises to top
+  const droneBottom = 70;
+  const droneTop = 15;
+  const droneYPercent = droneBottom - (droneBottom - droneTop) * progress;
+  const droneYPx = (droneYPercent / 100) * window.innerHeight;
+
+  // Hover bob
+  hoverPhase += 0.03 * dt;
+  const hoverBob = Math.sin(hoverPhase) * 5;
+
+  // Roll angle from horizontal velocity (clamped)
+  const rollDeg = Math.max(-25, Math.min(25, droneVelX * 3.5));
+
+  // Apply drone transform
+  droneEl.style.transform = `translate(${droneCurrentX - 80}px, ${droneYPx + hoverBob}px) rotate(${rollDeg}deg)`;
+
+  // Dynamic glow intensity based on speed
+  const speed = Math.abs(droneVelX);
+  const glowIntensity = 15 + speed * 3;
+  const droneSvg = droneEl.querySelector('.drone-svg');
+  if (droneSvg) {
+    droneSvg.style.filter = `drop-shadow(0 0 ${glowIntensity}px rgba(42,255,106,${0.2 + speed * 0.04})) drop-shadow(0 4px 20px rgba(0,0,0,0.5))`;
+  }
+
+  // Spawn trail
+  trailTimer += dt;
+  if (trailTimer > 1.5) {
+    trailTimer = 0;
+    const trailX = droneCurrentX;
+    const trailY = droneYPx + hoverBob + 130; // below the drone (taller sprite)
+    spawnTrailDot(trailX, trailY);
+    if (speed > 1.5) spawnTrailDot(trailX, trailY); // extra at speed
+  }
+  updateTrail();
+
+  // Altimeter
+  altFill.style.height = (progress * 100) + '%';
+  altVal.textContent = Math.round(progress * 500) + 'm';
+
+  // Section visibility
+  document.querySelectorAll('.section-inner').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    const inView = rect.top < window.innerHeight * 0.8 && rect.bottom > window.innerHeight * 0.2;
+    el.classList.toggle('visible', inView);
+  });
+
+  requestAnimationFrame(animate);
+}
+
+requestAnimationFrame(animate);
+
+// ===== PARTICLE TRACES (circuit board vibe) =====
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+class Particle {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = canvas.height + 10;
+    this.speed = 0.3 + Math.random() * 0.8;
+    this.size = Math.random() * 1.5 + 0.5;
+    this.opacity = Math.random() * 0.3 + 0.05;
+    this.color = Math.random() > 0.7
+      ? `rgba(200,117,51,${this.opacity})`
+      : `rgba(42,255,106,${this.opacity})`;
+  }
+  update() {
+    this.y -= this.speed;
+    if (this.y < -10) this.reset();
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  }
+}
+
+const particles = Array.from({ length: 60 }, () => new Particle());
+
+function drawParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// ===== INITIAL VISIBILITY =====
+setTimeout(() => {
+  document.querySelectorAll('.section-inner').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.8 && rect.bottom > 0) {
+      el.classList.add('visible');
+    }
+  });
+}, 100);
+</script>
+
+</body>
+</html>
