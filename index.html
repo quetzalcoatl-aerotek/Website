@@ -215,11 +215,6 @@ body {
   opacity: 0.7;
 }
 
-.section-label::before {
-  content: '// ';
-  color: var(--trace-green);
-}
-
 /* === HERO SECTION === */
 .hero {
   min-height: 100vh;
@@ -571,12 +566,151 @@ h3 {
   z-index: 0;
   pointer-events: none;
 }
+
+/* === WELCOME MODAL === */
+.welcome-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(6, 31, 6, 0.85);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+  cursor: default;
+}
+.welcome-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.welcome-card {
+  position: relative;
+  max-width: 480px;
+  width: 100%;
+  background: linear-gradient(135deg, rgba(10,61,10,0.95), rgba(6,31,6,0.98));
+  border: 1px solid var(--copper);
+  border-radius: 8px;
+  padding: 36px 32px 32px;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(200,117,51,0.25), 0 20px 60px rgba(0,0,0,0.6);
+  transform: translateY(0) scale(1);
+  transition: transform 0.4s ease;
+}
+.welcome-overlay.hidden .welcome-card {
+  transform: translateY(20px) scale(0.96);
+}
+
+.welcome-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--copper) 20%, var(--copper-light) 50%, var(--copper) 80%, transparent);
+  border-radius: 8px 8px 0 0;
+}
+
+.welcome-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--copper-light);
+  font-size: 26px;
+  font-family: 'Share Tech Mono', monospace;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px 10px;
+  opacity: 0.7;
+  transition: opacity 0.2s, color 0.2s;
+}
+.welcome-close:hover { opacity: 1; color: var(--led-green); }
+
+.welcome-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--copper-light);
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  opacity: 0.7;
+  margin-bottom: 10px;
+}
+
+.welcome-card h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.6rem;
+  color: var(--copper-light);
+  letter-spacing: 3px;
+  margin-bottom: 16px;
+}
+
+.welcome-card p {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.welcome-btn {
+  display: inline-block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.9rem;
+  letter-spacing: 3px;
+  color: var(--led-green);
+  background: rgba(42,255,106,0.08);
+  border: 1px solid var(--led-green);
+  padding: 12px 28px;
+  border-radius: 4px;
+  text-decoration: none;
+  text-transform: uppercase;
+  text-shadow: 0 0 6px rgba(42,255,106,0.4);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+  cursor: pointer;
+}
+.welcome-btn:hover {
+  background: rgba(42,255,106,0.18);
+  box-shadow: 0 0 18px rgba(42,255,106,0.4);
+  transform: translateY(-2px);
+}
+
+.welcome-skip {
+  display: block;
+  margin-top: 14px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  background: none;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: color 0.2s;
+  width: 100%;
+}
+.welcome-skip:hover { color: var(--copper-light); }
 </style>
 </head>
 <body>
 
 <div class="pcb-bg"></div>
 <canvas class="particle-canvas" id="particles"></canvas>
+
+<!-- WELCOME MODAL -->
+<div class="welcome-overlay hidden" id="welcomeOverlay">
+  <div class="welcome-card">
+    <button class="welcome-close" id="welcomeClose" aria-label="Close">&times;</button>
+    <div class="welcome-label">incoming.signal</div>
+    <h2>JOIN THE PROGRAM</h2>
+    <p>Help shape the Dro-Duino platform. Take a moment to share your interest, use case, or feedback &mdash; it goes straight to the T3-RC team.</p>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSe5h0vrhBNxtvKvcOQQeiDmMX95AIeDblewf3F36-SpXm4m8g/viewform" target="_blank" rel="noopener" class="welcome-btn">Open Form &rarr;</a>
+    <button class="welcome-skip" id="welcomeSkip">Skip &middot; Continue to Site</button>
+  </div>
+</div>
 
 <!-- ALTIMETER -->
 <div class="altimeter">
@@ -1085,6 +1219,19 @@ h3 {
 </div>
 
 <script>
+// ===== WELCOME MODAL =====
+(function() {
+  const overlay = document.getElementById('welcomeOverlay');
+  const closeBtn = document.getElementById('welcomeClose');
+  const skipBtn = document.getElementById('welcomeSkip');
+  const dismiss = () => overlay.classList.add('hidden');
+  closeBtn.addEventListener('click', dismiss);
+  skipBtn.addEventListener('click', dismiss);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) dismiss(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') dismiss(); });
+  setTimeout(() => overlay.classList.remove('hidden'), 10000);
+})();
+
 // ===== REVERSE SCROLL ENGINE =====
 const scrollWorld = document.getElementById('scrollWorld');
 const scrollContent = document.getElementById('scrollContent');
