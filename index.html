@@ -774,6 +774,56 @@ h3 {
   60%  { left: 100%; }
   100% { left: 100%; }
 }
+
+/* === CONTACT MODAL & FORM === */
+.contact-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.contact-form-group label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--copper-light);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+.contact-input {
+  background: rgba(6, 31, 6, 0.7);
+  border: 1px solid var(--trace-green);
+  border-radius: 4px;
+  padding: 12px;
+  color: var(--silk);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+.contact-textarea {
+  background: rgba(6, 31, 6, 0.7);
+  border: 1px solid var(--trace-green);
+  border-radius: 4px;
+  padding: 12px;
+  color: var(--silk);
+  font-family: 'Exo 2', sans-serif;
+  font-size: 14px;
+  outline: none;
+  resize: vertical;
+  min-height: 120px;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+.contact-input:focus, .contact-textarea:focus {
+  border-color: var(--copper);
+  box-shadow: 0 0 10px rgba(200,117,51,0.25);
+}
+.contact-input::placeholder, .contact-textarea::placeholder {
+  color: rgba(255,255,255,0.25);
+}
+button.contact-trigger {
+  appearance: none;
+  -webkit-appearance: none;
+  font-weight: inherit;
+}
 </style>
 </head>
 <body>
@@ -788,8 +838,34 @@ h3 {
     <div class="welcome-label">incoming.signal</div>
     <h2>JOIN THE PROGRAM</h2>
     <p>Help shape the Quetzalcoatl platform. Take a moment to share your interest, use case, or feedback &mdash; it goes straight to the T3-RC team.</p>
-    <a href="mailto:tonatiuh.fitzgerald@gmail.com" class="welcome-btn">Contact Us &rarr;</a>
+    <button class="welcome-btn contact-trigger">Contact Us &rarr;</button>
     <button class="welcome-skip" id="welcomeSkip">Skip &middot; Continue to Site</button>
+  </div>
+</div>
+
+<!-- CONTACT MODAL -->
+<div class="welcome-overlay hidden" id="contactOverlay" style="z-index: 1001;">
+  <div class="welcome-card contact-card" style="text-align: left; max-width: 520px;">
+    <button class="welcome-close" id="contactClose" aria-label="Close">&times;</button>
+    <div class="welcome-label">transmission.panel</div>
+    <h2 style="font-family: 'Orbitron', sans-serif; color: var(--copper-light); margin-bottom: 12px; letter-spacing: 3px;">TRANSMIT SIGNAL</h2>
+    <p style="font-size: 0.9rem; color: rgba(255,255,255,0.6); line-height: 1.5; margin-bottom: 24px;">
+      Establish direct telemetry contact with the Quetzalcoatl team at T3-RC.
+    </p>
+    
+    <form id="contactForm" style="display: flex; flex-direction: column; gap: 18px;">
+      <div class="contact-form-group">
+        <label for="contactEmail">Sender Email</label>
+        <input type="email" id="contactEmail" required class="contact-input" placeholder="your.name@domain.com">
+      </div>
+      
+      <div class="contact-form-group">
+        <label for="contactMessage">Message Payload</label>
+        <textarea id="contactMessage" required class="contact-textarea" placeholder="Type your inquiry, proposed application, or message..."></textarea>
+      </div>
+      
+      <button type="submit" class="welcome-btn" style="align-self: flex-start; border: 1px solid var(--led-green); margin-top: 6px;">Transmit Signal &rarr;</button>
+    </form>
   </div>
 </div>
 
@@ -1037,9 +1113,9 @@ h3 {
         </p>
         <div class="cta-block">
           <div class="cta-eyebrow">&gt;&gt; Transmission Open</div>
-          <a href="mailto:tonatiuh.fitzgerald@gmail.com" class="cta-btn">
+          <button class="cta-btn contact-trigger">
             Contact the Team <span class="cta-arrow">&rarr;</span>
-          </a>
+          </button>
           <div class="cta-sub">Share your use case &middot; Request access &middot; Get updates</div>
         </div>
         <div class="led-row" style="justify-content: center; margin-top: 24px;">
@@ -1311,7 +1387,72 @@ h3 {
   skipBtn.addEventListener('click', dismiss);
   overlay.addEventListener('click', (e) => { if (e.target === overlay) dismiss(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') dismiss(); });
-  setTimeout(() => overlay.classList.remove('hidden'), 10000);
+  setTimeout(() => {
+    const contactOverlay = document.getElementById('contactOverlay');
+    if (contactOverlay && contactOverlay.classList.contains('hidden')) {
+      overlay.classList.remove('hidden');
+    }
+  }, 10000);
+})();
+
+// ===== CONTACT MODAL =====
+(function() {
+  const overlay = document.getElementById('contactOverlay');
+  const closeBtn = document.getElementById('contactClose');
+  const form = document.getElementById('contactForm');
+  const openButtons = document.querySelectorAll('.contact-trigger');
+  
+  const openModal = (e) => {
+    if (e) e.preventDefault();
+    const welcomeOverlay = document.getElementById('welcomeOverlay');
+    if (welcomeOverlay) welcomeOverlay.classList.add('hidden');
+    
+    form.style.display = 'flex';
+    const statusEl = document.getElementById('contactStatus');
+    if (statusEl) statusEl.remove();
+    
+    overlay.classList.remove('hidden');
+  };
+  
+  const dismiss = () => {
+    overlay.classList.add('hidden');
+  };
+  
+  openButtons.forEach(btn => btn.addEventListener('click', openModal));
+  closeBtn.addEventListener('click', dismiss);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) dismiss(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') dismiss(); });
+  
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('contactEmail').value;
+    const msg = document.getElementById('contactMessage').value;
+    
+    const subject = encodeURIComponent('Quetzalcoatl Inquiry');
+    const body = encodeURIComponent("From: " + email + "\n\nMessage:\n" + msg);
+    
+    form.style.display = 'none';
+    
+    const statusDiv = document.createElement('div');
+    statusDiv.id = 'contactStatus';
+    statusDiv.innerHTML = `
+      <div style="text-align: center; padding: 24px 0;">
+        <div class="led-dot green" style="width: 12px; height: 12px; margin: 0 auto 16px; float: none;"></div>
+        <div style="font-family: 'Share Tech Mono', monospace; color: var(--led-green); font-size: 14px; letter-spacing: 2px; text-shadow: 0 0 6px var(--led-green); text-transform: uppercase;">Transmission Initialized</div>
+        <div style="font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 8px;">Opening your system email client...</div>
+      </div>
+    `;
+    form.parentNode.appendChild(statusDiv);
+    
+    setTimeout(() => {
+      window.location.href = `mailto:tonatiuh.fitzgerald@gmail.com?subject=${subject}&body=${body}`;
+    }, 800);
+    
+    setTimeout(() => {
+      dismiss();
+      form.reset();
+    }, 2800);
+  });
 })();
 
 // ===== REVERSE SCROLL ENGINE =====
