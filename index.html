@@ -977,8 +977,7 @@
       <button class="welcome-close" id="welcomeClose" aria-label="Close">&times;</button>
       <div class="welcome-label">incoming.signal</div>
       <h2>JOIN THE PROGRAM</h2>
-      <p>Help shape the Quetzalcoatl platform. Take a moment to share your interest, use case, or feedback &mdash; it
-        goes straight to the T3-RC team.</p>
+      <p>Help shape the Quetzalcoatl platform. Take a moment to share your interest, use case, or feedback, which goes straight to the team.</p>
       <button class="welcome-btn contact-trigger">Contact Us &rarr;</button>
       <button class="welcome-skip" id="welcomeSkip">Skip &middot; Continue to Site</button>
     </div>
@@ -1261,196 +1260,300 @@
   <div class="scroll-world" id="scrollWorld">
     <div class="scroll-content" id="scrollContent">
 
-      <!-- SECTION 7: FOOTER (bottom of stack = top of scroll) -->
+      <!-- SECTION 8: FOOTER (bottom of stack = top of scroll) -->
       <section class="section footer-section" data-section="footer">
         <div class="section-inner">
           <h2>LAUNCH SEQUENCE</h2>
           <h3>Ready for Deployment</h3>
           <div class="trace-h"></div>
           <p class="body-text" style="text-align:center; margin: 0 auto;">
-            Quetzalcoatl is an open research platform by the T3-RC collective. Modular by design, autonomous by nature,
-            open by philosophy. From bench testing to beyond visual line of sight &mdash; this is VTOL, redefined.
+            Quetzalcoatl Drones, Inc. is building the future of modular, autonomous aviation. US-made, NDAA-compliant, and priced for rapid commercial adoption.
           </p>
           <div class="cta-block">
-            <div class="cta-eyebrow">&gt;&gt; Transmission Open</div>
+            <div class="cta-eyebrow">&gt;&gt; Telemetry Stream Open</div>
             <button class="cta-btn contact-trigger">
               Contact the Team <span class="cta-arrow">&rarr;</span>
             </button>
-            <div class="cta-sub">Share your use case &middot; Request access &middot; Get updates</div>
+            <div class="cta-sub">Share your application, request data package, or get investment updates</div>
           </div>
           <div class="led-row" style="justify-content: center; margin-top: 24px;">
             <div class="led-indicator">
-              <div class="led-dot green"></div><span class="led-text">SYSTEMS GO</span>
+              <div class="led-dot green"></div><span class="led-text">PROPULSION GO</span>
             </div>
             <div class="led-indicator">
-              <div class="led-dot blue"></div><span class="led-text">TELEMETRY LIVE</span>
+              <div class="led-dot blue"></div><span class="led-text">TELEMETRY LOCK</span>
             </div>
             <div class="led-indicator">
-              <div class="led-dot amber"></div><span class="led-text">GPS LOCK</span>
+              <div class="led-dot amber"></div><span class="led-text">GPS ESTABLISHED</span>
+            </div>
+            <div class="led-indicator">
+              <div class="led-dot red"></div><span class="led-text">SYSTEM ARMED</span>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- SECTION 6: SENSOR SUITE -->
-      <section class="section" data-section="sensors">
+      <!-- SECTION 7: TEAM & ECOSYSTEM -->
+      <section class="section" data-section="team">
         <div class="section-inner">
-          <h2>SENSOR SUITE</h2>
-          <h3>Distributed Fusion Architecture</h3>
+          <h2>TEAM &amp; ECOSYSTEM</h2>
+          <h3>Founding Members &amp; Advisory Networks</h3>
           <div class="trace-h"></div>
           <p class="body-text">
-            Nine custom AI vision modules power autonomous decision-making across every flight phase. The dual-Pi
-            architecture distributes sensor processing &mdash; forward-facing systems on Pi&nbsp;#1, downward-facing on
-            Pi&nbsp;#2 &mdash; for redundancy and specialized computation.
+            Our 9-person founding team brings deep expertise across hardware, robotics software, structural CAD, and cybersecurity. We are embedded in NYC's premier aviation and startup acceleration networks.
           </p>
           <div class="module-grid" style="margin-top: 24px;">
             <div class="module-card">
-              <div class="module-icon">&#128225;</div>
-              <div class="module-name">TF-Luna LiDAR</div>
-              <div class="module-desc">I2C rangefinder for precision altitude hold and obstacle avoidance during VTOL
-                operations</div>
+              <div class="module-name">T3 (Tonatiuh Fitzgerald)</div>
+              <div class="module-desc">Founder &amp; CEO. Full-stack drone architect who designed the hardware, vision stack, GCS, and sensor bridges.</div>
             </div>
             <div class="module-card">
-              <div class="module-icon">&#128266;</div>
-              <div class="module-name">HC-SR04 Sonar</div>
-              <div class="module-desc">Ultrasonic backup ranging via GPIO with voltage divider circuit for RPi
-                integration</div>
+              <div class="module-name">Nova</div>
+              <div class="module-desc">Business Lead. Drives investor relations, funding strategy, partnerships, and customer sales pipelines.</div>
             </div>
             <div class="module-card">
-              <div class="module-icon">&#128247;</div>
-              <div class="module-name">Dual Pi Cameras</div>
-              <div class="module-desc">Camera Module v3 on each Pi for simultaneous forward and downward vision
-                processing</div>
+              <div class="module-name">Yinson</div>
+              <div class="module-desc">Software Lead. Directs companion computer integration, ArduPilot, ROS2, and companion service operations.</div>
             </div>
             <div class="module-card">
-              <div class="module-icon">&#129517;</div>
-              <div class="module-name">Pixhawk IMU</div>
-              <div class="module-desc">9-DOF inertial measurement with GPS for attitude estimation and autonomous
-                navigation</div>
+              <div class="module-name">Li</div>
+              <div class="module-desc">Creative Director. Structural mechanical design, CAD preparation, and manufacturing tooling integration.</div>
+            </div>
+            <div class="module-card">
+              <div class="module-name">Rachica</div>
+              <div class="module-desc">Sensor Lead. Manages electrical testing, sensor suite design, and module documentation.</div>
+            </div>
+            <div class="module-card">
+              <div class="module-name">Zaid</div>
+              <div class="module-desc">Cybersecurity Lead. Designs secure AES-256 data streams, frequency hopping, and compliance profiles.</div>
             </div>
           </div>
           <div class="pin-header" style="margin-top: 20px;">
-            <div><span class="pin-label">MAVLINK_PORT</span> <span class="pin-val">/dev/ttyACM0 @ 115200</span></div>
-            <div><span class="pin-label">I2C_BUS</span> <span class="pin-val">Bus 1, TF-Luna @ 0x10</span></div>
-            <div><span class="pin-label">SONAR_TRIG</span> <span class="pin-val">GPIO 23 (BCM)</span></div>
-            <div><span class="pin-label">SONAR_ECHO</span> <span class="pin-val">GPIO 24 (BCM) w/ divider</span></div>
+            <div><span class="pin-label">NEWLAB_NAVY_YARD</span> <span class="pin-val">NYC premier drone hub, 84K sq ft testing facility, link to Anduril network</span></div>
+            <div><span class="pin-label">NYC_EDC_FELLOWSHIP</span> <span class="pin-val">Capital access and enterprise customer development cohort</span></div>
+            <div><span class="pin-label">NUAIR_TEST_SITE</span> <span class="pin-val">Syracuse UAS testing infrastructure for beyond line of sight validation</span></div>
+            <div><span class="pin-label">NYPD_DRONE_PROGRAM</span> <span class="pin-val">First responder pilot feedback and operational design input</span></div>
           </div>
         </div>
       </section>
 
-      <!-- SECTION 5: ARCHITECTURE -->
-      <section class="section" data-section="arch">
+      <!-- SECTION 6: SEED PROSPECTUS -->
+      <section class="section" data-section="prospectus">
         <div class="section-inner">
-          <h2>DUAL-PI BRAIN</h2>
-          <h3>Dual Jetson Nano Companion Architecture</h3>
+          <h2>SEED PROSPECTUS</h2>
+          <h3>Investment Terms &amp; Financial Targets</h3>
           <div class="trace-h"></div>
-          <div class="arch-diagram">
+          <div class="arch-diagram" style="margin-top: 24px;">
             <div class="arch-box">
-              <h4>&#128994; JETSON NANO (PRIMARY)</h4>
+              <h4>&#128181; INVESTMENT TERMS</h4>
               <ul>
-                <li>Fixed-wing flight ops</li>
-                <li>Forward-facing cameras</li>
-                <li>Primary MAVLink bridge</li>
-                <li>CUDA-accelerated AI inference</li>
-                <li>Telemetry WebSocket</li>
+                <li>Round Size: $500,000 Seed Raise</li>
+                <li>Instrument: Standard SAFE (YC template)</li>
+                <li>Valuation Cap: $3,000,000 pre-money</li>
+                <li>Discount Rate: 20%</li>
+                <li>Series A Target: $3M at $15M pre (2028)</li>
               </ul>
             </div>
             <div class="arch-connector">
               <div class="conn-line"></div>
-              <div class="conn-label">PIXHAWK 2.4.8</div>
+              <div class="conn-label">USE OF FUNDS</div>
               <div class="conn-line"></div>
             </div>
             <div class="arch-box">
-              <h4>&#128309; RASPBERRY PI (SECONDARY)</h4>
+              <h4>&#128200; TARGET MILESTONES</h4>
               <ul>
-                <li>VTOL hover control</li>
-                <li>Downward-facing cameras</li>
-                <li>Landing zone detection</li>
-                <li>Lightweight sensor fusion</li>
-                <li>Cargo bay management</li>
+                <li>Engineering: $240K (3 FTEs for 6 months)</li>
+                <li>Manufacturing: $120K (25-unit initial batch)</li>
+                <li>Sales &amp; Marketing: $60K (trade shows, videos)</li>
+                <li>Regulatory: $40K (FAA waivers, patents)</li>
+                <li>Operations: $40K (rent, insurance, tools)</li>
               </ul>
             </div>
           </div>
-          <div class="led-row" style="margin-top: 12px;">
-            <div class="led-indicator">
-              <div class="led-dot green"></div><span class="led-text">NANO HEARTBEAT</span>
+          <div class="pin-header" style="margin-top: 20px;">
+            <div><span class="pin-label">2026_TARGETS</span> <span class="pin-val">3-5 prototype units sold, $60K revenue, 9 team members</span></div>
+            <div><span class="pin-label">2027_TARGETS</span> <span class="pin-val">100 units sold, $2.2M ARR target, $700K net income, Q2 breakeven</span></div>
+            <div><span class="pin-label">2028_TARGETS</span> <span class="pin-val">500 units sold, $10.0M ARR target, $3.5M net income, 25 team members</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 5: MARKET & USE CASES -->
+      <section class="section" data-section="market">
+        <div class="section-inner">
+          <h2>MARKET &amp; REAL ROI</h2>
+          <h3>High-Value Verticals &amp; Target Applications</h3>
+          <div class="trace-h"></div>
+          <p class="body-text">
+            Geopolitical bans on Chinese imports combined with new FAA rules have cleared a massive path for US-made modular VTOLs. Our platform delivers exceptional efficiency gains and immediate cost reductions.
+          </p>
+          <div class="module-grid" style="margin-top: 24px;">
+            <div class="module-card">
+              <div class="module-icon">&#128657;</div>
+              <div class="module-name">Search &amp; Rescue</div>
+              <div class="module-desc">System: $18,999<br>ROI: Search times cut from 8 hours to 2 hours for 1,200+ North American teams.</div>
             </div>
-            <div class="led-indicator">
-              <div class="led-dot blue"></div><span class="led-text">RPi HEARTBEAT</span>
+            <div class="module-card">
+              <div class="module-icon">&#127969;</div>
+              <div class="module-name">Bridge Inspection</div>
+              <div class="module-desc">System: $28,000<br>ROI: Costs cut from $25,000 to $2,000 per inspection with no road closures.</div>
             </div>
-            <div class="led-indicator">
-              <div class="led-dot amber"></div><span class="led-text">PIXHAWK LINK</span>
+            <div class="module-card">
+              <div class="module-icon">&#9889;</div>
+              <div class="module-name">Wind Turbine Inspect</div>
+              <div class="module-desc">System: $28,000<br>ROI: Cut inspection cost from $3,000 to $150 per unit, saving $1.4M annually per 500-turbine farm.</div>
             </div>
-            <div class="led-indicator">
-              <div class="led-dot red"></div><span class="led-text">ARMED</span>
+            <div class="module-card">
+              <div class="module-icon">&#127973;</div>
+              <div class="module-name">Medical Delivery</div>
+              <div class="module-desc">System: $30,000<br>ROI: Temperature-controlled pod transport for hospital systems. Market growing 24% annually.</div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- SECTION 4: MODULES -->
+      <!-- SECTION 4: AI AUTONOMY & SOFTWARE -->
+      <section class="section" data-section="autonomy">
+        <div class="section-inner">
+          <h2>AI AUTONOMY &amp; SOFTWARE</h2>
+          <h3>NVIDIA Jetson Orin Nano Companion Stack</h3>
+          <div class="trace-h"></div>
+          <p class="body-text">
+            A unified software ecosystem built to deliver deep edge intelligence. A dedicated Jetson companion computer processes heavy vision modules, communicating with the low-level flight controller via MAVLink.
+          </p>
+          <div class="arch-diagram" style="margin-top: 24px;">
+            <div class="arch-box">
+              <h4>&#128994; JETSON ORIN NANO 8GB</h4>
+              <ul>
+                <li>7 production-ready CV modules</li>
+                <li>Onboard AI vision and landing zone tracking</li>
+                <li>Companion compute via ROS2 and MAVROS</li>
+                <li>MAVLink data telemetry pipeline</li>
+                <li>Web interface and flight logging services</li>
+              </ul>
+            </div>
+            <div class="arch-connector">
+              <div class="conn-line"></div>
+              <div class="conn-label">MAVLINK BRIDGE</div>
+              <div class="conn-line"></div>
+            </div>
+            <div class="arch-box">
+              <h4>&#128309; FLIGHT CONTROL &amp; GCS</h4>
+              <ul>
+                <li>Pixhawk autopilot (NDAA-compliant)</li>
+                <li>ArduPilot firmware for tailsitter flight</li>
+                <li>Custom Python/Qt Ground Control Station</li>
+                <li>Sensor Bridge data platform (MQTT/FastAPI)</li>
+                <li>VL53L1X LiDAR carrier PCB integrations</li>
+              </ul>
+            </div>
+          </div>
+          <div class="led-row" style="margin-top: 20px;">
+            <div class="led-indicator">
+              <div class="led-dot green"></div><span class="led-text">ORIN HEARTBEAT</span>
+            </div>
+            <div class="led-indicator">
+              <div class="led-dot blue"></div><span class="led-text">MAVROS LINK</span>
+            </div>
+            <div class="led-indicator">
+              <div class="led-dot amber"></div><span class="led-text">AUTOPILOT GO</span>
+            </div>
+            <div class="led-indicator">
+              <div class="led-dot red"></div><span class="led-text">ARMED &amp; COMPLIANT</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: 14 MISSION MODULES -->
       <section class="section" data-section="modules">
         <div class="section-inner">
           <h2>14 MISSION MODULES</h2>
-          <h3>Hot-Swappable Payload Architecture</h3>
+          <h3>Hot-Swappable Payload Ecosystem</h3>
           <div class="trace-h"></div>
           <p class="body-text">
-            Each module slots into a standardized carrier board with power, data, and mechanical interfaces. Swap in
-            seconds &mdash; no tools, no firmware changes, no recalibration. Just click and fly.
+            Each module slots into a standardized carrier board with power, data, and mechanical interfaces. Operators can swap modules in under five minutes with no tools, no firmware changes, and no recalibration.
           </p>
-          <div class="module-grid">
-            <div class="module-card">
-              <div class="module-icon">&#127777;&#65039;</div>
-              <div class="module-name">THERMAL IMAGING</div>
-              <div class="module-desc">FLIR-class IR sensor for search &amp; rescue, agriculture, and infrastructure
-                inspection</div>
-            </div>
-            <div class="module-card">
-              <div class="module-icon">&#128269;</div>
-              <div class="module-name">ZOOM OPTICS</div>
-              <div class="module-desc">30x optical zoom for high-altitude surveillance and wildlife monitoring</div>
-            </div>
-            <div class="module-card">
-              <div class="module-icon">&#128300;</div>
-              <div class="module-name">MACRO VISION</div>
-              <div class="module-desc">Close-range inspection for infrastructure cracks, corrosion, and surface defects
-              </div>
-            </div>
-            <div class="module-card">
-              <div class="module-icon">&#128230;</div>
-              <div class="module-name">CARGO BAY</div>
-              <div class="module-desc">Autonomous delivery payload with GPS-guided drop and confirmation systems</div>
-            </div>
-            <div class="module-card">
-              <div class="module-icon">&#128161;</div>
-              <div class="module-name">LED ARRAY</div>
-              <div class="module-desc">Multi-mode programmable lighting for night ops, signaling, and entertainment
-              </div>
-            </div>
+          <div class="module-grid" style="margin-top: 24px;">
             <div class="module-card">
               <div class="module-icon">&#128737;&#65039;</div>
-              <div class="module-name">SECURITY PATROL</div>
-              <div class="module-desc">AI-powered perimeter monitoring with anomaly detection and live alerting</div>
+              <div class="module-name">M1: LANDING ZONE</div>
+              <div class="module-desc">Autonomous precision landing in any terrain using camera vision</div>
+            </div>
+            <div class="module-card">
+              <div class="module-icon">&#128641;</div>
+              <div class="module-name">M2: OBSTACLE AVOID</div>
+              <div class="module-desc">LiDAR and stereo vision sensors for safe autonomous navigation</div>
+            </div>
+            <div class="module-card">
+              <div class="module-icon">&#128100;</div>
+              <div class="module-name">M3: PERSON DETECT</div>
+              <div class="module-desc">Real-time object detection for search and rescue and safety patrol</div>
+            </div>
+            <div class="module-card">
+              <div class="module-icon">&#128663;</div>
+              <div class="module-name">M4: VEHICLE TRACK</div>
+              <div class="module-desc">Traffic, fleet logistics, and perimeter monitoring tracking</div>
+            </div>
+            <div class="module-card">
+              <div class="module-icon">&#127777;&#65039;</div>
+              <div class="module-name">M5: THERMAL ANOMALY</div>
+              <div class="module-desc">Fire detection, leak inspection, and utility monitoring</div>
             </div>
             <div class="module-card">
               <div class="module-icon">&#127807;</div>
-              <div class="module-name">NDVI SCANNER</div>
-              <div class="module-desc">Multispectral vegetation analysis for precision agriculture</div>
+              <div class="module-name">M6: AGRICULTURE</div>
+              <div class="module-desc">NDVI crop health analysis and water stress mapping</div>
+            </div>
+            <div class="module-card">
+              <div class="module-icon">&#128300;</div>
+              <div class="module-name">M7: INFRASTRUCTURE</div>
+              <div class="module-desc">Close-approach zoom inspection for bridges, towers, and lines</div>
+            </div>
+            <div class="module-card">
+              <div class="module-icon">&#128737;&#65039;</div>
+              <div class="module-name">M8: SECURITY PATROL</div>
+              <div class="module-desc">Perimeter sweeps with AI anomaly detection and live alerts</div>
+            </div>
+            <div class="module-card">
+              <div class="module-icon">&#128230;</div>
+              <div class="module-name">M9: CARGO BAY</div>
+              <div class="module-desc">Temperature-controlled pod carrying up to 5 kg payload</div>
+            </div>
+            <div class="module-card">
+              <div class="module-icon">&#128161;</div>
+              <div class="module-name">M10: LED LIGHTING</div>
+              <div class="module-desc">High-power array for night search and rescue operations</div>
+            </div>
+            <div class="module-card">
+              <div class="module-icon">&#129517;</div>
+              <div class="module-name">M11: RTK GPS SURVEY</div>
+              <div class="module-desc">Centimeter-level accuracy for high-fidelity mapping</div>
             </div>
             <div class="module-card">
               <div class="module-icon">&#128225;</div>
-              <div class="module-name">RELAY NODE</div>
-              <div class="module-desc">Mesh networking relay for extending comms range in remote operations</div>
+              <div class="module-name">M12: 4G/5G MODEM</div>
+              <div class="module-desc">Beyond Visual Line of Sight telemetry and real-time cloud sync</div>
+            </div>
+            <div class="module-card">
+              <div class="module-icon">&#128269;</div>
+              <div class="module-name">M13: CUSTOM LiDAR</div>
+              <div class="module-desc">Proprietary VL53L1X range sensor carrier for close proximity checks</div>
+            </div>
+            <div class="module-card">
+              <div class="module-icon">&#128274;</div>
+              <div class="module-name">M14: SECURE COMMS</div>
+              <div class="module-desc">AES-256 encryption and frequency hopping for defense tasks</div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- SECTION 3: POWER SYSTEM -->
+      <!-- SECTION 2: PROPULSION & POWER -->
       <section class="section" data-section="power">
         <div class="section-inner">
           <h2>PROPULSION &amp; POWER</h2>
-          <h3>Tailsitter VTOL Drive System</h3>
+          <h3>Tailsitter Drive &amp; ESC Configuration</h3>
           <div class="trace-h"></div>
           <div class="stat-row">
             <div class="stat-badge">
@@ -1475,94 +1578,83 @@
             </div>
           </div>
           <div class="pin-header">
-            <div><span class="pin-label">MOTORS</span> <span class="pin-val">T-Motor MN4012-11 400KV &times; 2</span>
-            </div>
-            <div><span class="pin-label">ESC_PRIMARY</span> <span class="pin-val">T-Motor ALPHA 60A (FOC + CAN)</span>
-            </div>
-            <div><span class="pin-label">BATTERY</span> <span class="pin-val">6S LiPo 22.2V nom / 25.2V max</span></div>
-            <div><span class="pin-label">PROTOCOL</span> <span class="pin-val">CAN 2.0 + PWM fallback</span></div>
-            <div><span class="pin-label">FIRMWARE</span> <span class="pin-val">AM32 (open-source, recommended)</span>
-            </div>
+            <div><span class="pin-label">MOTORS</span> <span class="pin-val">T-Motor MN4012-11 400KV (x 2 wing motors)</span></div>
+            <div><span class="pin-label">ESC_PRIMARY</span> <span class="pin-val">T-Motor ALPHA 60A (FOC + CAN protocol)</span></div>
+            <div><span class="pin-label">BATTERY</span> <span class="pin-val">6S LiPo 22.2V nominal, 25.2V max</span></div>
+            <div><span class="pin-label">PROTOCOL</span> <span class="pin-val">CAN 2.0 interface with PWM fallback</span></div>
+            <div><span class="pin-label">FIRMWARE</span> <span class="pin-val">AM32 open-source ESC firmware (recommended)</span></div>
           </div>
         </div>
       </section>
 
-      <!-- SECTION 2: SPECS -->
+      <!-- SECTION 1: PLATFORM SPECS -->
       <section class="section" data-section="specs">
         <div class="section-inner">
           <h2>PLATFORM SPECS</h2>
-          <h3>Quetzalcoatl Tailsitter VTOL</h3>
+          <h3>eXploraVTOL Tailsitter Flight System</h3>
           <div class="trace-h"></div>
-          <div class="stat-row">
-            <div class="stat-badge">
-              <div class="stat-val">5'</div>
-              <div class="stat-unit">Wingspan</div>
-            </div>
-            <div class="stat-badge">
-              <div class="stat-val">2</div>
-              <div class="stat-unit">Motors</div>
-            </div>
-            <div class="stat-badge">
-              <div class="stat-val">14</div>
-              <div class="stat-unit">Modules</div>
-            </div>
-            <div class="stat-badge">
-              <div class="stat-val">9</div>
-              <div class="stat-unit">AI Vision</div>
-            </div>
-            <div class="stat-badge">
-              <div class="stat-val">1+1</div>
-              <div class="stat-unit">Nano + RPi</div>
-            </div>
-          </div>
-          <p class="body-text">
-            A dual-motor tailsitter that transitions seamlessly between vertical hover and efficient fixed-wing cruise.
-            The Quetzalcoatl bridges the gap between consumer toys and enterprise platforms &mdash; targeting the
-            $15K&ndash;$35K prosumer market with truly modular mission architecture.
-          </p>
-          <div class="pin-header" style="margin-top: 20px;">
-            <div><span class="pin-label">FLIGHT_CTRL</span> <span class="pin-val">Pixhawk 2.4.8 + ArduPilot</span></div>
-            <div><span class="pin-label">COMPANION_0</span> <span class="pin-val">Jetson Nano 4GB (Primary &mdash;
-                Fixed-Wing)</span></div>
-            <div><span class="pin-label">COMPANION_1</span> <span class="pin-val">Raspberry Pi 4 (Secondary &mdash; VTOL
-                Hover)</span></div>
-            <div><span class="pin-label">INFERENCE</span> <span class="pin-val">CUDA 10.2 / TensorRT 8 / JetPack
-                4.6</span></div>
-            <div><span class="pin-label">MARKET_GAP</span> <span class="pin-val">$15K&ndash;$35K Prosumer Segment</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- SECTION 1: HERO (top of stack = bottom of scroll / starting view) -->
-      <section class="section hero" data-section="hero">
-        <div class="section-inner">
-          <div class="section-label">T3-RC Research Collective</div>
-          <h1 class="hero-title">QUETZALCOATL</h1>
-          <div class="hero-sub">MODULAR AUTONOMOUS VTOL PLATFORM</div>
-          <div class="trace-h" style="max-width: 400px; margin: 20px auto;"></div>
-          <p class="hero-tagline">
-            14 interchangeable mission modules. Dual companion computers. One aircraft that does it all. Open research
-            meets autonomous flight.
-          </p>
           <div class="stat-row">
             <div class="stat-badge">
               <div class="stat-val">5ft</div>
               <div class="stat-unit">Wingspan</div>
             </div>
             <div class="stat-badge">
-              <div class="stat-val">14</div>
-              <div class="stat-unit">Modules</div>
+              <div class="stat-val">25-50</div>
+              <div class="stat-unit">KM Range</div>
             </div>
             <div class="stat-badge">
-              <div class="stat-val">9</div>
-              <div class="stat-unit">AI Cores</div>
+              <div class="stat-val">60-100</div>
+              <div class="stat-unit">KM/H Cruise Speed</div>
+            </div>
+            <div class="stat-badge">
+              <div class="stat-val">2-8</div>
+              <div class="stat-unit">KG Payload Cap</div>
+            </div>
+            <div class="stat-badge">
+              <div class="stat-val">100%</div>
+              <div class="stat-unit">NDAA Compliant</div>
+            </div>
+          </div>
+          <p class="body-text">
+            The eXploraVTOL platform transitions seamlessly between vertical takeoff and highly efficient fixed-wing cruise. Designed to bridge the critical market gap between 5K consumer drones and 25K+ enterprise systems, it delivers professional-grade aerial intelligence at commercial price points.
+          </p>
+          <div class="pin-header" style="margin-top: 20px;">
+            <div><span class="pin-label">CONFIGURATION</span> <span class="pin-val">Tailsitter VTOL (vertical takeoff, fixed-wing cruise)</span></div>
+            <div><span class="pin-label">AI_COMPUTE</span> <span class="pin-val">NVIDIA Jetson Orin Nano 8GB Onboard Inference</span></div>
+            <div><span class="pin-label">FLIGHT_CTRL</span> <span class="pin-val">ArduPilot on Pixhawk Hardware (NDAA-compliant)</span></div>
+            <div><span class="pin-label">PRICE_RANGE</span> <span class="pin-val">$15K to $50K (three variants: Consumer, Commercial, Military)</span></div>
+            <div><span class="pin-label">NDAA_STATUS</span> <span class="pin-val">Fully compliant, built with US and allied-nation components</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 0: HERO (top of stack = bottom of scroll / starting view) -->
+      <section class="section hero" data-section="hero">
+        <div class="section-inner">
+          <div class="section-label">Quetzalcoatl Drones, Inc.</div>
+          <h1 class="hero-title">QUETZALCOATL</h1>
+          <div class="hero-sub">THE WORLD'S FIRST MODULAR AI VTOL DRONE PLATFORM</div>
+          <div class="trace-h" style="max-width: 400px; margin: 20px auto;"></div>
+          <p class="hero-tagline">
+            One aircraft. 14 mission-specific hot-swappable modules. Full AI inference onboard. Takeoff vertically from anywhere, cruise at fixed-wing efficiency.
+          </p>
+          <div class="stat-row">
+            <div class="stat-badge">
+              <div class="stat-val">45-90</div>
+              <div class="stat-unit">Min Flight Time</div>
+            </div>
+            <div class="stat-badge">
+              <div class="stat-val">14</div>
+              <div class="stat-unit">Mission Modules</div>
+            </div>
+            <div class="stat-badge">
+              <div class="stat-val">$3.0M</div>
+              <div class="stat-unit">Seed SAFE Cap</div>
             </div>
           </div>
           <div class="scroll-hint">
             <span class="arrow">&uarr;</span> SCROLL TO ASCEND <span class="arrow">&uarr;</span><br>
-            <span style="font-size: 10px; opacity: 0.6; margin-top: 6px; display: inline-block;">MOVE MOUSE OR A/D KEYS
-              TO STEER</span>
+            <span style="font-size: 10px; opacity: 0.6; margin-top: 6px; display: inline-block;">MOVE MOUSE OR A/D KEYS TO STEER</span>
           </div>
         </div>
       </section>
